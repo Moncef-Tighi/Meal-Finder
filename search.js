@@ -13,7 +13,13 @@ const fetchMeal= function(){
     }    
 
 }
- 
+
+const getMealById = function(mealId){
+    return fetch(`https://www.themealdb.com/api/json/v1/1/lookup.php?i=${mealId}`)
+        .then(data=> data.json())
+}
+
+
 submit.addEventListener("submit",async  (event)=>{
     event.preventDefault();
 
@@ -49,5 +55,42 @@ submit.addEventListener("keydown",async (event)=>{
 })
 
 random.addEventListener("click", ()=> {
+
+})
+
+meals.addEventListener('click',async (event)=> {
+    if (event.target.classList[0]==="meal-info"){
+        const id = event.target.getAttribute("data-mealid");
+        let data = await getMealById(id);
+        data= data.meals[0]
+        const ingredients = [];
+        for (let i=1; i<=20; i++) {
+            //Oui, c'est extrêmement confus comme logique. Mais c'est parce que l'API est mal foutu. too bad !
+            if(data[`strIngredient${i}`]){
+                ingredients.push(`${data[`strIngredient${i}`]} - ${data[`strMeasure${i}`]}`);
+            } else {
+                break
+            }
+        }
+        resultHeading.innerHTML=""
+        resultHeading.innerHTML=`
+            <div class="single-meal">
+                <h1>${data.strMeal}</h1>
+                <img src="${data.strMealThumb}" alt="${data.strMeal}" />
+                <div class="single-meal-info">
+                    ${data.strCategory ? `<p>${data.strCategory}</p>`: ""}
+                    ${data.strArea ? `<p>${data.strArea}</p>`: ""}
+                </div>
+
+                <div clas"main">
+                    <p>${data.strInstructions}</p>
+                    <h2>Ingredient</h2>
+                    <ul>
+                        ${ingredients.map(ingredient=> `<li>${ingredient}</li>`).join("")}
+                    </ul>
+
+            </div>
+            `
+    }
 
 })
